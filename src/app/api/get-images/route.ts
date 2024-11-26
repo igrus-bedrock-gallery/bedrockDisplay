@@ -86,11 +86,7 @@ export async function GET(req: Request) {
                 continue;
               }
             }
-            // 15초 대기 후 다시 요청
-            //               if (pendingImages.count > 0) {
-            //                 console.log("Waiting for 15 seconds before next fetch...");
-            //                 await new Promise((resolve) => setTimeout(resolve, 15000));
-            //               }
+
             if (pendingImages.count <= 0) {
               resetPendingImages();
               isStreamClosed = true; // 스트림 상태 업데이트
