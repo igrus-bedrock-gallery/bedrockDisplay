@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { imageQueue, resetPendingImages } from "@/utils/state";
+import {
+  imageQueue,
+  resetPendingImages,
+  dequeueImage,
+  enqueueImage,
+} from "@/utils/state";
 import { ImageData } from "@/types/frames";
 import axios from "axios";
 
@@ -29,36 +34,28 @@ export async function GET(req: Request) {
         let intervalId: NodeJS.Timeout | null = null;
         let isStreamClosed = false;
 
-        const sendKeepAlive = () => {
-          if (!isStreamClosed) {
-            controller.enqueue(`data: "keep-alive"\n\n`);
-            console.log("Sent keep-alive message to client.");
-          } else {
-            console.warn("Attempted to send keep-alive on closed stream.");
-          }
-        };
-
         const fetchAndProcessData = async () => {
           try {
             while (pendingImages.count > 0 && !isStreamClosed) {
+              //
               console.log("Fetching data from AWS API Gateway...");
-              const response = await axios.get(apiUrl, { timeout: 3000 });
+              const response = await axios.get(apiUrl, { timeout: 200000 });
 
-              let dataReceived = false;
               if (Array.isArray(response.data) && response.data.length > 0) {
                 console.log("Data fetched from AWS:", response.data);
-                dataReceived = true;
 
                 response.data.forEach((obj: ImageData) => {
-                  imageQueue.push(obj);
-                  pendingImages.count -= 1;
+                  enqueueImage(obj);
+                  pendingImages.count--;
                 });
               } else {
                 console.warn("No data received or data format invalid.");
               }
 
               while (imageQueue.length > 0 && !isStreamClosed) {
-                const nextData = imageQueue.shift();
+                //&& !isStreamClosed
+                const nextData = dequeueImage();
+                console.log("Dequeued:", nextData);
                 if (!nextData) break;
 
                 const frameKey = frameKeyQueue.shift();
@@ -72,24 +69,32 @@ export async function GET(req: Request) {
                       frameKey,
                       data: nextData,
                     });
+
                     controller.enqueue(`data: ${eventData}\n\n`);
                     console.log("Sent data to client:", eventData);
                   } catch (error) {
                     console.error("Error sending data:", error);
-                    imageQueue.push(nextData);
+                    // enqueueImage(nextData);
+                    // imageQueue.push(nextData);
                   }
                 }
               }
-              // 데이터를 받지 못했다면 1초 후에 재시도
-              if (!dataReceived) {
+              // 데이터를 받지 못했다면 30초 후에 재시도
+              if (pendingImages.count > 0) {
                 console.log("No data received, retrying in 1 seconds...");
-                await new Promise((resolve) => setTimeout(resolve, 1));
+                await new Promise((resolve) => setTimeout(resolve, 30000));
                 continue;
               }
             }
-
+            // 15초 대기 후 다시 요청
+            //               if (pendingImages.count > 0) {
+            //                 console.log("Waiting for 15 seconds before next fetch...");
+            //                 await new Promise((resolve) => setTimeout(resolve, 15000));
+            //               }
             if (pendingImages.count <= 0) {
               resetPendingImages();
+              isStreamClosed = true; // 스트림 상태 업데이트
+
               console.log("No more pending images. Closing stream.");
               clearInterval(intervalId!); // Keep-alive 중지
               controller.close();
@@ -99,7 +104,16 @@ export async function GET(req: Request) {
           }
         };
 
-        // 3초마다 keep-alive 메시지 전송 시작
+        const sendKeepAlive = () => {
+          if (!isStreamClosed) {
+            controller.enqueue(`data: "keep-alive"\n\n`);
+            console.log("Sent keep-alive message to client.");
+          } else {
+            console.warn("Attempted to send keep-alive on closed stream.");
+          }
+        };
+
+        // // 3초마다 keep-alive 메시지 전송 시작
         intervalId = setInterval(sendKeepAlive, 3000); // 3초마다 Keep-alive 메시지 전송
 
         // 초기 데이터 가져오기 시작

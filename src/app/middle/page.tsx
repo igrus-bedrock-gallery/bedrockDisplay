@@ -53,6 +53,23 @@ export default function MiddleScreen() {
     },
   ]);
 
+  // 프레임 상태 업데이트 함수를 메모이제이션
+  // const updateFrames = useCallback((frameKey: number, data: ImageData) => {
+  //   console.log("updateFrames called with:", { frameKey, data });
+  //   setFrames((prev) =>
+  //     prev.map((frame) =>
+  //       frame.key === frameKey
+  //         ? {
+  //             ...frame,
+  //             Image: data.Image,
+  //             Description: data.Description,
+  //             timestamp: Date.now() - Math.floor(Math.random() * 10000),
+  //           }
+  //         : frame
+  //     )
+  //   );
+  // }, []);
+
   const updateFrames = useCallback((frameKey: number, data: ImageData) => {
     console.log("updateFrames called with:", { frameKey, data });
 
@@ -73,24 +90,7 @@ export default function MiddleScreen() {
     });
   }, []);
 
-  // 프레임 상태 업데이트 함수를 메모이제이션
-  // const updateFrames = useCallback((frameKey: number, data: ImageData) => {
-  //   console.log("updateFrames called with:", { frameKey, data });
-  //   setFrames((prev) =>
-  //     prev.map((frame) =>
-  //       frame.key === frameKey
-  //         ? {
-  //             ...frame,
-  //             Image: data.Image,
-  //             Description: data.Description,
-  //             timestamp: Date.now() - Math.floor(Math.random() * 10000),
-  //           }
-  //         : frame
-  //     )
-  //   );
-  // }, []);
-
-  useDataHandler(pendingImages, true, updateFrames); //pendingImages가 바뀔 때마다 실행될 것임
+  useDataHandler(pendingImages, updateFrames); //pendingImages가 바뀔 때마다 실행될 것임
 
   useEffect(() => {
     console.log("Frames updated - Rendering check:");

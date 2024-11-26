@@ -1,4 +1,21 @@
 export let imageQueue: { Image: string; Description: string }[] = [];
+
+export function enqueueImage(data: { Image: string; Description: string }) {
+  imageQueue.push(data);
+}
+
+export function dequeueImage() {
+  return imageQueue.shift();
+}
+
+export function getImageQueue() {
+  return [...imageQueue]; // 현재 상태를 복사하여 반환
+}
+
+export function clearImageQueue() {
+  imageQueue = [];
+}
+
 export let availableKeys: number[] = [];
 
 export let pendingImages = 0;

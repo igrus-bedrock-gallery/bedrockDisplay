@@ -78,7 +78,7 @@ export default function LastScreen() {
     );
   }, []);
 
-  useDataHandler(pendingImages, false, updateFrames);
+  useDataHandler(pendingImages, updateFrames);
 
   useEffect(() => {
     console.log("Frames updated:", frames);
