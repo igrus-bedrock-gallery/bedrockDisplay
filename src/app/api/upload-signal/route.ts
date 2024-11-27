@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { incrementPendingImages } from "@/utils/state";
+import { pendingImages, incrementPendingImages } from "@/utils/state";
 
 // POST 요청 처리
 export async function POST(request: Request) {
   incrementPendingImages();
   const now = new Date();
-  console.log("현재 시간 (서버):", now.toLocaleString());
+  console.log("현재 시간 (서버) : ", now.toLocaleString());
 
+  console.log("pendingImages : ", pendingImages);
   const body = await request.json();
   console.log("POST request received with body:", body);
   console.log();

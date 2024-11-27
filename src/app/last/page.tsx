@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { ImageData, FrameData } from "@/types/frames";
-import PollerComponent from "../_components/PollerComponent";
-import { useDataHandler } from "@/hooks/useDataHandler";
+import { FrameContext } from "../../contexts/FrameContext";
+
+// import PollerComponent from "../_components/PollerComponent";
+// import { useDataHandler } from "@/hooks/useDataHandler";
 
 export default function LastScreen() {
-  const [pendingImages, setPendingImages] = useState(0);
+  const { frameQueue } = useContext(FrameContext)!;
 
   // 고정 frame
   const [gridImages] = useState<string[]>([
@@ -55,49 +57,48 @@ export default function LastScreen() {
     },
   ]);
 
-  // 프레임 상태 업데이트 함수를 메모이제이션
-  const updateFramesLast = useCallback((frameKey: number, data: ImageData) => {
-    console.log("updateFrames called with:", { frameKey, data });
+  const updateFramesMiddle = useCallback(
+    (frameKey: number, data: FrameData) => {
+      console.log("updateFramesMiddle called with:", { frameKey, data });
 
-    setFrames((prev) => {
-      console.log("Previous frames state:", prev);
-      const updatedFrames = prev.map((frame) =>
-        frame.key === frameKey
-          ? {
-              ...frame,
-              Image: data.Image,
-              Description: data.Description,
-              timestamp: Date.now() + Math.random(),
-            }
-          : frame
+      setFrames((prev) =>
+        prev.map((frame) =>
+          frame.key === frameKey
+            ? {
+                ...frame,
+                Image: data.Image,
+                Description: data.Description,
+                timestamp: Date.now() + Math.random(), // 새 타임스탬프 추가
+              }
+            : frame
+        )
       );
-      console.log("Updated frames state:", updatedFrames);
-      return updatedFrames;
-    });
-  }, []);
+    },
+    []
+  );
 
-  // useDataHandler(pendingImages, updateFrames);
-  useDataHandler(pendingImages, () => {}, updateFramesLast);
-
+  // 프레임 큐에서 데이터 반영
   useEffect(() => {
-    console.log("Frames updated - Rendering check:");
-    frames.forEach((frame, index) => {
-      console.log(`Frame ${index}:`, frame);
+    const newFrames = frameQueue.filter(
+      (item) => item.frameKey >= 5 && item.frameKey <= 7
+    );
+    newFrames.forEach((frame) => {
+      updateFramesMiddle(frame.frameKey, {
+        key: frame.frameKey,
+        Image: frame.data.Image,
+        Description: frame.data.Description,
+        timestamp: Date.now() + Math.random(),
+      });
     });
-  }, [frames]);
-
-  useEffect(() => {
-    console.log("pendingImages updated in middle-page:", pendingImages);
-  }, [pendingImages]);
+  }, [frameQueue, updateFramesMiddle]);
 
   return (
     <main
       className="relative flex items-center justify-start h-screen w-full bg-cover bg-center"
       style={{ backgroundImage: "url('/images/background.png')" }}
     >
-      <PollerComponent setPendingImages={setPendingImages} />
+      {/* <PollerComponent setPendingImages={setPendingImages} /> */}
 
-      {/* 전체화면 그리드 */}
       <div
         className="relative flex flex-row items-center "
         style={{
@@ -151,9 +152,6 @@ export default function LastScreen() {
                   style={{
                     height: "70%",
                     aspectRatio: "360 / 490",
-
-                    // width: frame.key === 5 ? "calc(100%*1.03)" : "auto",
-                    // width: "auto",
                     clipPath: "ellipse(50% 50% at 50% 50%)", // 타원형 클리핑
                   }}
                 />

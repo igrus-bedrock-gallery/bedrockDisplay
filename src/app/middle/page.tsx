@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { ImageData, FrameData } from "@/types/frames";
-import PollerComponent from "../_components/PollerComponent";
-import { useDataHandler } from "@/hooks/useDataHandler";
+import { FrameContext } from "../../contexts/FrameContext";
 
 export default function MiddleScreen() {
-  const [pendingImages, setPendingImages] = useState(0);
+  const { frameQueue } = useContext(FrameContext)!;
 
   const [gridImages] = useState<string[]>([
     "/images/frame1.png",
@@ -54,41 +53,39 @@ export default function MiddleScreen() {
   ]);
 
   const updateFramesMiddle = useCallback(
-    (frameKey: number, data: ImageData) => {
-      console.log("updateFrames called with:", { frameKey, data });
+    (frameKey: number, data: FrameData) => {
+      console.log("updateFramesMiddle called with:", { frameKey, data });
 
-      setFrames((prev) => {
-        console.log("Previous frames state:", prev);
-        const updatedFrames = prev.map((frame) =>
+      setFrames((prev) =>
+        prev.map((frame) =>
           frame.key === frameKey
             ? {
                 ...frame,
                 Image: data.Image,
                 Description: data.Description,
-                timestamp: Date.now() + Math.random(),
+                timestamp: Date.now() + Math.random(), // 새 타임스탬프 추가
               }
             : frame
-        );
-        console.log("Updated frames state:", updatedFrames);
-        return updatedFrames;
-      });
+        )
+      );
     },
     []
   );
-  useDataHandler(pendingImages, updateFramesMiddle, () => {});
 
-  // useDataHandler(pendingImages, updateFrames); //pendingImages가 바뀔 때마다 실행될 것임
-
-  // useEffect(() => {
-  //   console.log("Frames updated - Rendering check:");
-  //   frames.forEach((frame, index) => {
-  //     console.log(`Frame ${index}:`, frame);
-  //   });
-  // }, [frames]);
-
+  // 프레임 큐에서 데이터 반영
   useEffect(() => {
-    console.log("pendingImages updated in middle-page:", pendingImages);
-  }, [pendingImages]);
+    const newFrames = frameQueue.filter(
+      (item) => item.frameKey >= 1 && item.frameKey <= 4
+    );
+    newFrames.forEach((frame) => {
+      updateFramesMiddle(frame.frameKey, {
+        key: frame.frameKey,
+        Image: frame.data.Image,
+        Description: frame.data.Description,
+        timestamp: Date.now() + Math.random(),
+      });
+    });
+  }, [frameQueue, updateFramesMiddle]);
 
   return (
     <main
@@ -98,7 +95,7 @@ export default function MiddleScreen() {
         backgroundSize: "calc(100% + 180px)", // 너비 2790 기준으로 배경 크기를 2970에 맞춤
       }}
     >
-      <PollerComponent setPendingImages={setPendingImages} />
+      {/* <PollerComponent setPendingImages={setPendingImages} /> */}
 
       <div
         className="relative grid grid-cols-4 items-center"
@@ -144,11 +141,6 @@ export default function MiddleScreen() {
                 style={{
                   height: "70%",
                   aspectRatio: "360 / 490",
-                  // height: "45vh",
-                  // width: "15.2vw",
-                  // width: "50%",
-                  // width: "calc(100% * 1.03)", // 너비를 1.2배로 설정
-
                   clipPath: "ellipse(50% 50% at 50% 50%)", // 타원형 클리핑
                 }}
               />
