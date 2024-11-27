@@ -49,8 +49,10 @@ export async function GET(req: Request) {
 
                 // response.data.forEach((obj: ImageData) =>
                 for (const obj of response.data) {
-                  if (isStreamClosed) break;
-                  pendingImages.count--;
+                  if (isStreamClosed) {
+                    console.log("스트림 닫혀있어서 안보냄ㅋ");
+                    break;
+                  }
 
                   try {
                     const frameKey = frameManager.getNextKey(); // 1~7 순환 키
@@ -60,8 +62,14 @@ export async function GET(req: Request) {
                     });
 
                     // if (!isStreamClosed) {
-                    controller.enqueue(`data: ${eventData}\n\n`);
+
+                    // controller.enqueue(sibal);
+                    const sibal = `data: ${eventData}\n\n`;
+                    console.log(sibal);
+                    controller.enqueue(sibal);
                     console.log("Sent data to client:", eventData);
+                    console.log("Stream status - closed:", isStreamClosed);
+                    pendingImages.count--;
                     // }
                   } catch (error) {
                     console.error("Error sending data:", error);
@@ -123,7 +131,7 @@ export async function GET(req: Request) {
         // 모든 작업이 완료되면 스트림 닫기
         if (!isProcessing && isStreamClosed) {
           console.log("Finalizing stream closure.");
-          controller.close();
+          // controller.close();
         }
       },
     }),
