@@ -40,7 +40,6 @@ export async function GET(req: Request) {
 
           try {
             while (pendingImages.count > 0 && !isStreamClosed) {
-              //&& !isStreamClosed
               //
               console.log("Fetching data from AWS API Gateway...");
               const response = await axios.get(apiUrl, { timeout: 200000 });
