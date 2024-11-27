@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { ImageData, FrameData } from "@/types/frames";
 import PollerComponent from "../_components/PollerComponent";
 import { useDataHandler } from "@/hooks/useDataHandler";
+import { usePolling } from "@/hooks/usePolling";
 
 export default function MiddleScreen() {
   const [pendingImages, setPendingImages] = useState(0);
@@ -23,59 +24,69 @@ export default function MiddleScreen() {
   ]);
 
   const [frames, setFrames] = useState<FrameData[]>([
-    {
-      key: 1,
-      Image: "/images/mock1.png",
-      Description:
-        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
-      timestamp: Date.now() + Math.random(),
-    },
-    {
-      key: 2,
-      Image: "/images/mock2.png",
-      Description:
-        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
-      timestamp: Date.now() + Math.random(),
-    },
-    {
-      key: 3,
-      Image: "/images/mock3.png",
-      Description:
-        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
-      timestamp: Date.now() + Math.random(),
-    },
-    {
-      key: 4,
-      Image: "/images/mock4.png",
-      Description:
-        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
-      timestamp: Date.now() + Math.random(),
-    },
+    // {
+    //   key: 1,
+    //   Image: "/images/mock1.png",
+    //   Description:
+    //     "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+    //   timestamp: Date.now() + Math.random(),
+    // },
+    // {
+    //   key: 2,
+    //   Image: "/images/mock2.png",
+    //   Description:
+    //     "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+    //   timestamp: Date.now() + Math.random(),
+    // },
+    // {
+    //   key: 3,
+    //   Image: "/images/mock3.png",
+    //   Description:
+    //     "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+    //   timestamp: Date.now() + Math.random(),
+    // },
+    // {
+    //   key: 4,
+    //   Image: "/images/mock4.png",
+    //   Description:
+    //     "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+    //   timestamp: Date.now() + Math.random(),
+    // },
   ]);
 
-  const updateFramesMiddle = useCallback(
-    (frameKey: number, data: ImageData) => {
-      console.log("updateFrames called with:", { frameKey, data });
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/get-data');
+      const data = await response.json();
+      setFrames(data.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }, []);
 
-      setFrames((prev) => {
-        console.log("Previous frames state:", prev);
-        const updatedFrames = prev.map((frame) =>
-          frame.key === frameKey
-            ? {
-                ...frame,
-                Image: data.Image,
-                Description: data.Description,
-                timestamp: Date.now() + Math.random(),
-              }
-            : frame
-        );
-        console.log("Updated frames state:", updatedFrames);
-        return updatedFrames;
-      });
-    },
-    []
-  );
-  useDataHandler(pendingImages, updateFramesMiddle, () => {});
+  // const updateFramesMiddle = useCallback(
+  //   (frameKey: number, data: ImageData) => {
+  //     console.log("updateFrames called with:", { frameKey, data });
+
+  //     setFrames((prev) => {
+  //       console.log("Previous frames state:", prev);
+  //       const updatedFrames = prev.map((frame) =>
+  //         frame.key === frameKey
+  //           ? {
+  //               ...frame,
+  //               Image: data.Image,
+  //               Description: data.Description,
+  //               timestamp: Date.now() + Math.random(),
+  //             }
+  //           : frame
+  //       );
+  //       console.log("Updated frames state:", updatedFrames);
+  //       return updatedFrames;
+  //     });
+  //   },
+  //   []
+  // );
+  // useDataHandler(pendingImages, updateFramesMiddle, () => {});
 
   // useDataHandler(pendingImages, updateFrames); //pendingImages가 바뀔 때마다 실행될 것임
 
@@ -86,9 +97,15 @@ export default function MiddleScreen() {
   //   });
   // }, [frames]);
 
+  // useEffect(() => {
+  //   console.log("pendingImages updated in middle-page:", pendingImages);
+  // }, [pendingImages]);
+
   useEffect(() => {
-    console.log("pendingImages updated in middle-page:", pendingImages);
-  }, [pendingImages]);
+    fetchData();
+  }, [fetchData]);
+
+  usePolling(fetchData, 10000);
 
   return (
     <main
@@ -98,7 +115,7 @@ export default function MiddleScreen() {
         backgroundSize: "calc(100% + 180px)", // 너비 2790 기준으로 배경 크기를 2970에 맞춤
       }}
     >
-      <PollerComponent setPendingImages={setPendingImages} />
+      {/* <PollerComponent setPendingImages={setPendingImages} /> */}
 
       <div
         className="relative grid grid-cols-4 items-center"
