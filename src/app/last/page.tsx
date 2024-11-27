@@ -1,42 +1,12 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
-import PollerComponent from "../_components/PollerComponent";
-import { useFrameManager } from "@/hooks/useFrameManager";
 import { ImageData, FrameData } from "@/types/frames";
+import PollerComponent from "../_components/PollerComponent";
 import { useDataHandler } from "@/hooks/useDataHandler";
 
 export default function LastScreen() {
   const [pendingImages, setPendingImages] = useState(0);
-
-  // 프레임 데이터 상태 관리
-  const [frames, setFrames] = useState<FrameData[]>([
-    {
-      key: 5,
-      Image: "/images/mock1.png",
-      Description: "",
-      timestamp: Date.now(),
-    },
-    {
-      key: 0,
-      Image: "/images/mock1.png",
-      Description: "",
-      timestamp: Date.now(),
-    },
-    {
-      key: 6,
-      Image: "/images/mock3.png",
-      Description: "",
-      timestamp: Date.now(),
-    },
-    {
-      key: 7,
-      Image: "/images/mock4.png",
-      Description: "",
-      timestamp: Date.now(),
-    },
-  ]);
 
   // 고정 frame
   const [gridImages] = useState<string[]>([
@@ -53,39 +23,71 @@ export default function LastScreen() {
     "/images/4th.png",
   ]);
 
-  // 인물 사진
-  const [portraitImage, setPortraitImage] = useState<string[]>([
-    "/images/mock1.png",
-    "/images/mock2.png",
-    "/images/mock3.png",
-    "/images/mock4.png",
+  // 프레임 데이터 상태 관리
+  const [frames, setFrames] = useState<FrameData[]>([
+    {
+      key: 5,
+      Image: "/images/mock1.png",
+      Description:
+        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+      timestamp: Date.now() + Math.random(),
+    },
+    {
+      key: 0,
+      Image: "/images/mock1.png",
+      Description:
+        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+      timestamp: Date.now() + Math.random(),
+    },
+    {
+      key: 6,
+      Image: "/images/mock3.png",
+      Description:
+        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+      timestamp: Date.now() + Math.random(),
+    },
+    {
+      key: 7,
+      Image: "/images/mock4.png",
+      Description:
+        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+      timestamp: Date.now() + Math.random(),
+    },
   ]);
 
   // 프레임 상태 업데이트 함수를 메모이제이션
-  const updateFrames = useCallback((frameKey: number, data: ImageData) => {
+  const updateFramesLast = useCallback((frameKey: number, data: ImageData) => {
     console.log("updateFrames called with:", { frameKey, data });
-    setFrames((prev) =>
-      prev.map((frame) =>
+
+    setFrames((prev) => {
+      console.log("Previous frames state:", prev);
+      const updatedFrames = prev.map((frame) =>
         frame.key === frameKey
           ? {
               ...frame,
               Image: data.Image,
               Description: data.Description,
-              timestamp: Date.now(),
+              timestamp: Date.now() + Math.random(),
             }
           : frame
-      )
-    );
+      );
+      console.log("Updated frames state:", updatedFrames);
+      return updatedFrames;
+    });
   }, []);
 
-  useDataHandler(pendingImages, updateFrames);
+  // useDataHandler(pendingImages, updateFrames);
+  useDataHandler(pendingImages, () => {}, updateFramesLast);
 
   useEffect(() => {
-    console.log("Frames updated:", frames);
+    console.log("Frames updated - Rendering check:");
+    frames.forEach((frame, index) => {
+      console.log(`Frame ${index}:`, frame);
+    });
   }, [frames]);
 
   useEffect(() => {
-    console.log("Frames updated:", pendingImages);
+    console.log("pendingImages updated in middle-page:", pendingImages);
   }, [pendingImages]);
 
   return (
@@ -93,10 +95,7 @@ export default function LastScreen() {
       className="relative flex items-center justify-start h-screen w-full bg-cover bg-center"
       style={{ backgroundImage: "url('/images/background.png')" }}
     >
-      <PollerComponent
-        // pendingImages={pendingImages}
-        setPendingImages={setPendingImages}
-      />
+      <PollerComponent setPendingImages={setPendingImages} />
 
       {/* 전체화면 그리드 */}
       <div
@@ -111,7 +110,7 @@ export default function LastScreen() {
         {frames.map((frame, index) =>
           frame.key === 0 ? (
             <div
-              key={frame.key}
+              key={frame.timestamp}
               className="w-[40%]"
               style={{ visibility: "hidden" }}
             >
@@ -119,7 +118,7 @@ export default function LastScreen() {
             </div>
           ) : (
             <div
-              key={frame.key}
+              key={frame.timestamp}
               className="relative flex flex-col justify-center items-center"
               style={{
                 height: "90%", // 동적으로 높이 조정
@@ -136,7 +135,6 @@ export default function LastScreen() {
               >
                 {/* 프레임 이미지 */}
                 <img
-                  key={index}
                   src={gridImages[index]}
                   alt={`Frame ${index}`}
                   className="relative w-full h-full object-contain z-30"
@@ -152,8 +150,10 @@ export default function LastScreen() {
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[52%] z-10"
                   style={{
                     height: "70%",
+                    aspectRatio: "360 / 490",
+
                     // width: frame.key === 5 ? "calc(100%*1.03)" : "auto",
-                    width: "auto",
+                    // width: "auto",
                     clipPath: "ellipse(50% 50% at 50% 50%)", // 타원형 클리핑
                   }}
                 />
@@ -186,9 +186,7 @@ export default function LastScreen() {
                   }}
                 >
                   <p className="w-full break-keep leading-tight">
-                    당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을
-                    펼쳤으며, 뛰어난 공로로 세계적인 신뢰와 안전성을 갖춘
-                    소방관입니다.
+                    {frame.Description}
                   </p>
                 </div>
               </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
 import { ImageData, FrameData } from "@/types/frames";
 import PollerComponent from "../_components/PollerComponent";
 import { useDataHandler } from "@/hooks/useDataHandler";
@@ -22,6 +21,7 @@ export default function MiddleScreen() {
     "/images/3rd.png",
     "/images/4th.png",
   ]);
+
   const [frames, setFrames] = useState<FrameData[]>([
     {
       key: 1,
@@ -53,51 +53,38 @@ export default function MiddleScreen() {
     },
   ]);
 
-  // 프레임 상태 업데이트 함수를 메모이제이션
-  // const updateFrames = useCallback((frameKey: number, data: ImageData) => {
-  //   console.log("updateFrames called with:", { frameKey, data });
-  //   setFrames((prev) =>
-  //     prev.map((frame) =>
-  //       frame.key === frameKey
-  //         ? {
-  //             ...frame,
-  //             Image: data.Image,
-  //             Description: data.Description,
-  //             timestamp: Date.now() - Math.floor(Math.random() * 10000),
-  //           }
-  //         : frame
-  //     )
-  //   );
-  // }, []);
+  const updateFramesMiddle = useCallback(
+    (frameKey: number, data: ImageData) => {
+      console.log("updateFrames called with:", { frameKey, data });
 
-  const updateFrames = useCallback((frameKey: number, data: ImageData) => {
-    console.log("updateFrames called with:", { frameKey, data });
+      setFrames((prev) => {
+        console.log("Previous frames state:", prev);
+        const updatedFrames = prev.map((frame) =>
+          frame.key === frameKey
+            ? {
+                ...frame,
+                Image: data.Image,
+                Description: data.Description,
+                timestamp: Date.now() + Math.random(),
+              }
+            : frame
+        );
+        console.log("Updated frames state:", updatedFrames);
+        return updatedFrames;
+      });
+    },
+    []
+  );
+  useDataHandler(pendingImages, updateFramesMiddle, () => {});
 
-    setFrames((prev) => {
-      console.log("Previous frames state:", prev);
-      const updatedFrames = prev.map((frame) =>
-        frame.key === frameKey
-          ? {
-              ...frame,
-              Image: data.Image,
-              Description: data.Description,
-              timestamp: Date.now() + Math.random(),
-            }
-          : frame
-      );
-      console.log("Updated frames state:", updatedFrames);
-      return updatedFrames;
-    });
-  }, []);
+  // useDataHandler(pendingImages, updateFrames); //pendingImages가 바뀔 때마다 실행될 것임
 
-  useDataHandler(pendingImages, updateFrames); //pendingImages가 바뀔 때마다 실행될 것임
-
-  useEffect(() => {
-    console.log("Frames updated - Rendering check:");
-    frames.forEach((frame, index) => {
-      console.log(`Frame ${index}:`, frame);
-    });
-  }, [frames]);
+  // useEffect(() => {
+  //   console.log("Frames updated - Rendering check:");
+  //   frames.forEach((frame, index) => {
+  //     console.log(`Frame ${index}:`, frame);
+  //   });
+  // }, [frames]);
 
   useEffect(() => {
     console.log("pendingImages updated in middle-page:", pendingImages);
@@ -111,10 +98,7 @@ export default function MiddleScreen() {
         backgroundSize: "calc(100% + 180px)", // 너비 2790 기준으로 배경 크기를 2970에 맞춤
       }}
     >
-      <PollerComponent
-        // pendingImages={pendingImages}
-        setPendingImages={setPendingImages}
-      />
+      <PollerComponent setPendingImages={setPendingImages} />
 
       <div
         className="relative grid grid-cols-4 items-center"
@@ -159,10 +143,10 @@ export default function MiddleScreen() {
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[52%] z-10"
                 style={{
                   height: "70%",
-
+                  aspectRatio: "360 / 490",
                   // height: "45vh",
                   // width: "15.2vw",
-                  width: "auto",
+                  // width: "50%",
                   // width: "calc(100% * 1.03)", // 너비를 1.2배로 설정
 
                   clipPath: "ellipse(50% 50% at 50% 50%)", // 타원형 클리핑

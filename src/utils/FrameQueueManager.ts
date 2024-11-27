@@ -1,46 +1,57 @@
 export class FrameQueueManager {
   private static instance: FrameQueueManager;
-  private availableKeys: Set<number> = new Set();
+  private currentKey: number = 1;
+
+  // private availableKeys: Set<number> = new Set();
 
   private constructor() {}
 
   public static getInstance(): FrameQueueManager {
-    if (!this.instance) {
-      this.instance = new FrameQueueManager();
+    if (!FrameQueueManager.instance) {
+      FrameQueueManager.instance = new FrameQueueManager();
     }
-    return this.instance;
+    return FrameQueueManager.instance;
   }
-
-  initializeKeys(keys: number[]) {
-    this.availableKeys = new Set(keys);
-    console.log("Initialized keys:", Array.from(this.availableKeys));
-  }
-
-  getNextKey(): number | undefined {
-    if (this.availableKeys.size === 0) {
-      console.warn("No available keys");
-      return undefined;
-    }
-
-    const key = Array.from(this.availableKeys)[0];
-    this.availableKeys.delete(key);
-
-    console.log("Key retrieved:", key);
-    console.log("Remaining availableKeys:", Array.from(this.availableKeys));
+  public getNextKey(): number {
+    const key = this.currentKey;
+    this.currentKey = this.currentKey === 7 ? 1 : this.currentKey + 1; // 1~7 순환
     return key;
   }
 
-  addKey(key: number) {
-    if (!this.availableKeys.has(key)) {
-      this.availableKeys.add(key);
-      console.log("Key added back:", key);
-      console.log("Updated availableKeys:", Array.from(this.availableKeys));
-    }
+  public getCurrentKey(): number {
+    return this.currentKey;
   }
 
-  getAvailableKeys(): number[] {
-    return Array.from(this.availableKeys);
-  }
+  // initializeKeys(keys: number[]) {
+  //   this.availableKeys = new Set(keys);
+  //   console.log("Initialized keys:", Array.from(this.availableKeys));
+  // }
+
+  // getNextKey(): number {
+  //   if (this.availableKeys.size === 0) {
+  //     console.warn("No available keys");
+  //     return key;
+  //   }
+
+  //   const key = Array.from(this.availableKeys)[0];
+  //   this.availableKeys.delete(key);
+
+  //   console.log("Key retrieved:", key);
+  //   console.log("Remaining availableKeys:", Array.from(this.availableKeys));
+  //   return key;
+  // }
+
+  // addKey(key: number) {
+  //   if (!this.availableKeys.has(key)) {
+  //     this.availableKeys.add(key);
+  //     console.log("Key added back:", key);
+  //     console.log("Updated availableKeys:", Array.from(this.availableKeys));
+  //   }
+  // }
+
+  // getAvailableKeys(): number[] {
+  //   return Array.from(this.availableKeys);
+  // }
 }
 // export class FrameQueueManager {
 //   private static instance: FrameQueueManager;
