@@ -19,16 +19,21 @@ export function useDataHandler(
 
     console.log("useDataHandler 실행. pendingImages :", pendingImages);
 
-    // 기존 스트림이 활성 상태라면 새 스트림 생성 방지
-    if (eventSourceRef.current) {
-      console.log("Existing EventSource connection already active. Reusing.");
-      return eventSourceRef.current;
+    if (pendingImages === null || pendingImages <= 0) {
+      console.log("No valid pendingImages available for stream.");
+      return null;
     }
+
     // // 기존 스트림이 활성 상태라면 새 스트림 생성 방지
-    // if (eventSourceRef.current && activePendingImages === pendingImages) {
+    // if (eventSourceRef.current) {
     //   console.log("Existing EventSource connection already active. Reusing.");
     //   return eventSourceRef.current;
     // }
+    // 기존 스트림이 활성 상태라면 새 스트림 생성 방지
+    if (eventSourceRef.current && activePendingImages === pendingImages) {
+      console.log("Existing EventSource connection already active. Reusing.");
+      return eventSourceRef.current;
+    }
 
     if (pendingImages === null) {
       console.log("No pendingImages available for stream.");
@@ -46,7 +51,7 @@ export function useDataHandler(
     );
 
     //스트림생성
-    // setActiveStreamPendingImages(pendingImages); //현재 스트림 큐 first꺼낸 값으로 스트림 생성하겠다
+    setActiveStreamPendingImages(pendingImages); //현재 스트림 큐 first꺼낸 값으로 스트림 생성하겠다
 
     eventSource.onopen = () => {
       console.log("EventSource connection opened");
@@ -77,9 +82,11 @@ export function useDataHandler(
 
     eventSource.onerror = (error) => {
       console.error("EventSource error:", error);
-      eventSource.close();
+      // eventSource.close();
+      eventSourceRef.current?.close();
+
       eventSourceRef.current = null; // 스트림 종료 시 참조 해제
-      // setActiveStreamPendingImages(null);
+      setActiveStreamPendingImages(null);
     };
 
     eventSourceRef.current = eventSource;
@@ -92,14 +99,14 @@ export function useDataHandler(
 
     return () => {
       if (eventSourceRef.current) {
-        //eventSource
+        // eventSource
         console.log("Cleaning up EventSource connection");
         // eventSource.close();
         eventSourceRef.current.close();
 
         // 스트림 정리
         eventSourceRef.current = null;
-        // setActiveStreamPendingImages(null);
+        setActiveStreamPendingImages(null);
       }
     };
   }, [setupEventSource]);
