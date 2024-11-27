@@ -58,6 +58,8 @@ export function useDataHandler(
     };
 
     eventSource.onmessage = (event) => {
+      console.log("EventSource message received:", event.data); // 메시지 확인
+
       if (event.data === '"keep-alive"') {
         console.log("Received keep-alive message. Ignoring.");
         return;

@@ -59,10 +59,10 @@ export async function GET(req: Request) {
                       data: obj,
                     });
 
-                    if (!isStreamClosed) {
-                      controller.enqueue(`data: ${eventData}\n\n`);
-                      console.log("Sent data to client:", eventData);
-                    }
+                    // if (!isStreamClosed) {
+                    controller.enqueue(`data: ${eventData}\n\n`);
+                    console.log("Sent data to client:", eventData);
+                    // }
                   } catch (error) {
                     console.error("Error sending data:", error);
                   }
@@ -103,7 +103,11 @@ export async function GET(req: Request) {
 
         const sendKeepAlive = () => {
           if (!isStreamClosed) {
-            controller.enqueue(`data: "keep-alive"\n\n`);
+            try {
+              controller.enqueue(`data: "keep-alive"\n\n`);
+            } catch (e) {
+              console.warn("stream closed");
+            }
             console.log("Sent keep-alive message to client.");
           } else {
             console.warn("Attempted to send keep-alive on closed stream.");
