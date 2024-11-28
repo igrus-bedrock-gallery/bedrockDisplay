@@ -26,28 +26,28 @@ export default function MiddleScreen() {
       key: 1,
       Image: "/images/mock1.png",
       Description:
-        "가나다라마바당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. 당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수dsfalsdf상했습니다.당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. 당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다.당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
       timestamp: Date.now() + Math.random(),
     },
     {
       key: 2,
       Image: "/images/mock2.png",
       Description:
-        "가나다라마바당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. 화재 현장에서 빛나는 활약을 펼쳤으며 뛰어난 공로로 세계적인 소방 안전상까지가나다라마사 아자차카 수상했습니다. ",
+        "당신은 미래 경찰관으로 선발되어 범죄 예방과 시민 보호에 헌신하며, 뛰어난 직업 윤리와 리더십으로 여러 상을 수상했습니다. 당신의 노력은 지역 사회의 안전을 지키는 데 큰 기여를 하고 있습니다.",
       timestamp: Date.now() + Math.random(),
     },
     {
       key: 3,
       Image: "/images/mock3.png",
       Description:
-        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+        "당신은 세계적인 사업가로 인정받아 혁신적인 아이디어와 도전 정신으로 다양한 산업 분야에서 성공을 이루었습니다. 당신의 기업은 수많은 일자리를 창출하며, 전 세계적으로 영향을 미치고 있습니다.",
       timestamp: Date.now() + Math.random(),
     },
     {
       key: 4,
       Image: "/images/mock4.png",
       Description:
-        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+        "당신은 미래의 전기기사로 선발되어 첨단 기술을 활용해 전력 시스템의 효율성을 혁신적으로 개선하며, 지속 가능한 에너지 산업 발전에 기여하고 있습니다.",
       timestamp: Date.now() + Math.random(),
     },
   ]);
@@ -165,7 +165,10 @@ export default function MiddleScreen() {
               <div
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[85%] h-[88%] flex items-center justify-center text-white text-center"
                 style={{
-                  display: "block",
+                  display: "flex", // Flexbox 활성화
+                  flexDirection: "column", // 텍스트를 세로 정렬
+                  justifyContent: "center", // 수직 중앙 정렬
+                  alignItems: "center", // 수평 중앙 정렬
                   overflowWrap: "break-word",
                 }}
               >

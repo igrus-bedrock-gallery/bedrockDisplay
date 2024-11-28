@@ -42,14 +42,14 @@ export default function LastScreen() {
       key: 6,
       Image: "/images/mock3.png",
       Description:
-        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+        "당신은 세계적인 사업가로 인정받아 혁신적인 아이디어와 도전 정신으로 다양한 산업 분야에서 성공을 이루었습니다. 당신의 기업은 수많은 일자리를 창출하며, 전 세계적으로 영향을 미치고 있습니다.",
       timestamp: Date.now() + Math.random(),
     },
     {
       key: 7,
       Image: "/images/mock4.png",
       Description:
-        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+        "당신은 미래의 전기기사로 선발되어 첨단 기술을 활용해 전력 시스템의 효율성을 혁신적으로 개선하며, 지속 가능한 에너지 산업 발전에 기여하고 있습니다.",
       timestamp: Date.now() + Math.random(),
     },
   ]);
@@ -173,7 +173,10 @@ export default function LastScreen() {
                 <div
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[85%] h-[88%] flex items-center justify-center text-white text-center"
                   style={{
-                    display: "block",
+                    display: "flex", // Flexbox 활성화
+                    flexDirection: "column", // 텍스트를 세로 정렬
+                    justifyContent: "center", // 수직 중앙 정렬
+                    alignItems: "center", // 수평 중앙 정렬
                     overflowWrap: "break-word",
                   }}
                 >
