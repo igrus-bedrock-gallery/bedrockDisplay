@@ -58,7 +58,8 @@ export default function MiddleScreen() {
     try {
       const response = await fetch('/api/get-data');
       const data = await response.json();
-      setFrames(data.data);
+      console.log(data);
+      setFrames(data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
