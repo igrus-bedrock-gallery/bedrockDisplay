@@ -20,7 +20,7 @@ export default function LeftScreen() {
       <div className="flex flex-col justify-start items-center w-full h-full gap-20">
         <div
           className="justify-center"
-          style={{ marginTop: "2%", width: "83%" }}
+          style={{ marginTop: "1%", width: "83%" }}
         >
           <img
             src="/images/architecture.png"
