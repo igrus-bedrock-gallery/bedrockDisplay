@@ -27,10 +27,50 @@ export const FrameContext = createContext<FrameContextProps | undefined>(
 );
 
 export const FrameProvider = ({ children }: { children: ReactNode }) => {
+  const [pendingImages, setPendingImages] = useState<number>(0); // 서버의 pendingImages 상태 관리
+
   const [frameQueue, setFrameQueue] = useState<Frame[]>([]);
-  const [pendingImages, setPendingImages] = useState<number>(10); // 초기 대기 이미지 수
+  // const [pendingImages, setPendingImages] = useState<number>(0); // 초기 대기 이미지 수
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const currentFrameNumber = useRef<number>(1); // Ref로 변경
+  const currentFrameNumber = useRef<number>(0); // Ref로 변경
+
+  // pendingImages 상태를 가져오는 함수
+  const fetchPendingImages = async () => {
+    try {
+      const res = await axios.get("/api/pendingImages");
+      setPendingImages(res.data.pendingImages);
+      console.log("현재 pendingImages 값 : ", res.data.pendingImages);
+    } catch (error) {
+      console.error("Error fetching pending images:", error);
+    }
+  };
+
+  // 서버에 pendingImages 값을 업데이트하는 함수
+  const updatePendingImages = async (change: number) => {
+    try {
+      const res = await axios.post("/api/pendingImages", {
+        change,
+      });
+      setPendingImages(res.data.pendingImages); // 서버의 상태를 클라이언트로 동기화
+    } catch (error) {
+      console.error("Error updating pending images:", error);
+    }
+  };
+
+  // 주기적으로 서버에서 pendingImages 상태를 가져옴
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchPendingImages();
+    }, 5000); // 5초마다 서버 데이터를 가져옴
+
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 제거
+  }, []);
+
+  // // 서버에서 변경된 pendingImages 값에 따라 context 상태를 업데이트
+  // useEffect(() => {
+  //   // 상태가 변경되면 context 업데이트
+  //   console.log("pendingImages updated: ", pendingImages);
+  // }, [pendingImages]);
 
   const increaseCurrentFrameNumber = () => {
     if (currentFrameNumber.current === 7) {
@@ -67,28 +107,27 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
         ) {
           console.log("Images fetched:", response.data);
 
-          // FrameKey 1~7 매칭
-          // const updatedData = response.data.map((item: any, index: number) => ({
-          //   frameKey: (index % 7) + 1, // 1~7 순환
-          //   data: item,
-          // }));
           const updatedData = response.data.map((item: any, index: number) => {
             // map을 돌 때마다, currentFrameNumber를 1 증가시키고 증가된 number를 frameKey에 담아 줌.
             //  1~7 순환
-            const frameNumberToShow = currentFrameNumber.current;
+            // const frameNumberToShow = currentFrameNumber.current;
 
             increaseCurrentFrameNumber();
 
-            console.log("frame number : " + frameNumberToShow);
+            console.log(
+              "current changing frame number : " + currentFrameNumber.current
+            );
             console.log(item);
 
             return {
-              frameKey: frameNumberToShow,
+              frameKey: currentFrameNumber.current,
               data: item,
             };
           });
           addToQueue(updatedData);
-          setPendingImages((prev) => Math.max(prev - response.data.length, 0));
+
+          // 서버의 pendingImages 값을 줄임
+          await updatePendingImages(-response.data.length);
         } else {
           console.log("No data received. Retrying in 30 seconds...");
           await new Promise((resolve) => setTimeout(resolve, 30000));
@@ -101,8 +140,10 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    fetchImages();
-  }, []);
+    if (pendingImages) {
+      fetchImages();
+    }
+  }, [pendingImages]);
 
   return (
     <FrameContext.Provider

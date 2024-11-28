@@ -89,7 +89,7 @@ export default function LeftScreen() {
         {/* Top section with image */}
         <div
           className="justify-center"
-          style={{ marginTop: "5%", width: "83%" }}
+          style={{ marginTop: "3%", width: "83%" }}
         >
           <img
             src="/images/architecture.png"

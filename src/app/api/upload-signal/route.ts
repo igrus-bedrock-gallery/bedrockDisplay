@@ -5,8 +5,8 @@ import { pendingImages, incrementPendingImages } from "@/utils/state";
 export async function POST(request: Request) {
   incrementPendingImages();
   const now = new Date();
-  console.log("현재 시간 (서버) : ", now.toLocaleString());
 
+  console.log("현재 시간 (서버) : ", now.toLocaleString());
   console.log("pendingImages : ", pendingImages);
   const body = await request.json();
   console.log("POST request received with body:", body);

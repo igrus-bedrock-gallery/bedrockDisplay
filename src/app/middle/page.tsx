@@ -95,15 +95,11 @@ export default function MiddleScreen() {
         backgroundSize: "calc(100% + 180px)", // 너비 2790 기준으로 배경 크기를 2970에 맞춤
       }}
     >
-      {/* <PollerComponent setPendingImages={setPendingImages} /> */}
-
       <div
         className="relative grid grid-cols-4 items-center"
         style={{
           height: "100%",
           aspectRatio: "2790 / 1080", // 2790 x 1080 비율 고정
-
-          // width: "100%", // 화면 크기에 비례
           paddingLeft: "5%",
         }}
       >

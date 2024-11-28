@@ -4,9 +4,6 @@ import { useEffect, useState, useContext, useCallback } from "react";
 import { ImageData, FrameData } from "@/types/frames";
 import { FrameContext } from "../../contexts/FrameContext";
 
-// import PollerComponent from "../_components/PollerComponent";
-// import { useDataHandler } from "@/hooks/useDataHandler";
-
 export default function LastScreen() {
   const { frameQueue } = useContext(FrameContext)!;
 
@@ -57,25 +54,22 @@ export default function LastScreen() {
     },
   ]);
 
-  const updateFramesMiddle = useCallback(
-    (frameKey: number, data: FrameData) => {
-      console.log("updateFramesMiddle called with:", { frameKey, data });
+  const updateFramesLast = useCallback((frameKey: number, data: FrameData) => {
+    console.log("updateFramesLast called with:", { frameKey, data });
 
-      setFrames((prev) =>
-        prev.map((frame) =>
-          frame.key === frameKey
-            ? {
-                ...frame,
-                Image: data.Image,
-                Description: data.Description,
-                timestamp: Date.now() + Math.random(), // 새 타임스탬프 추가
-              }
-            : frame
-        )
-      );
-    },
-    []
-  );
+    setFrames((prev) =>
+      prev.map((frame) =>
+        frame.key === frameKey
+          ? {
+              ...frame,
+              Image: data.Image,
+              Description: data.Description,
+              timestamp: Date.now() + Math.random(), // 새 타임스탬프 추가
+            }
+          : frame
+      )
+    );
+  }, []);
 
   // 프레임 큐에서 데이터 반영
   useEffect(() => {
@@ -83,22 +77,20 @@ export default function LastScreen() {
       (item) => item.frameKey >= 5 && item.frameKey <= 7
     );
     newFrames.forEach((frame) => {
-      updateFramesMiddle(frame.frameKey, {
+      updateFramesLast(frame.frameKey, {
         key: frame.frameKey,
         Image: frame.data.Image,
         Description: frame.data.Description,
         timestamp: Date.now() + Math.random(),
       });
     });
-  }, [frameQueue, updateFramesMiddle]);
+  }, [frameQueue, updateFramesLast]);
 
   return (
     <main
       className="relative flex items-center justify-start h-screen w-full bg-cover bg-center"
       style={{ backgroundImage: "url('/images/background.png')" }}
     >
-      {/* <PollerComponent setPendingImages={setPendingImages} /> */}
-
       <div
         className="relative flex flex-row items-center "
         style={{
@@ -163,7 +155,6 @@ export default function LastScreen() {
                 style={{
                   height: "16%", // 전체 높이의 1/4
                   width: "auto",
-                  // background: "pink",
                 }}
               >
                 {/* 설명 이미지 */}
@@ -177,7 +168,6 @@ export default function LastScreen() {
                 <div
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] flex items-center justify-center text-white text-center "
                   style={{
-                    // overflow: "hidden", // 텍스트가 부모 요소를 넘어가지 않도록 설정
                     textOverflow: "ellipsis", // 넘어가는 텍스트를 ...으로 표시
                     fontWeight: 300,
                     fontSize: "clamp(10px, 2vw, 20px)", // 반응형 폰트 크기
