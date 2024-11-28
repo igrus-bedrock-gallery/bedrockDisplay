@@ -4,6 +4,8 @@ import path from 'path';
 import { FrameQueueManager } from "@/utils/FrameQueueManager";
 import axios from "axios";
 
+const LAMBDA_FUNCTION_URL = "https://isgdpnwgdggswjirn4jzwtzgda0fdxmf.lambda-url.ap-northeast-1.on.aws/";
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   let pendingImages = { count: Number(searchParams.get("pendingImages")) };
@@ -32,16 +34,21 @@ export async function GET(req: Request) {
 
         for (const obj of response.data) {
           const frameKey = frameManager.getNextKey();
-          const jsonPath = path.join(process.cwd(), 'src/app/data/results.json');
-          const jsonData = await fs.readFile(jsonPath, 'utf8');
-          const data = JSON.parse(jsonData);
-
-          data.data[frameKey - 1].imgUrl = obj.imgUrl;
-          data.data[frameKey - 1].description = obj.description;
-
-          await fs.writeFile(jsonPath, JSON.stringify(data, null, 2));
-
-          console.log("Updated data for frame:", frameKey);
+          
+          const payload = {
+            key: frameKey.toString(),
+            ImageURL: obj.imgUrl,
+            Description: obj.description
+          };
+        
+          try {
+            const lambdaResponse = await axios.post(LAMBDA_FUNCTION_URL, payload);
+            console.log("Lambda response:", lambdaResponse.data);
+            console.log("Updated data for frame:", frameKey);
+          } catch (error) {
+            if (axios.isAxiosError(error))
+              console.error("Error invoking Lambda function:", error.response ? error.response.data : error.message);
+          }
           pendingImages.count--;
         }
       } else {
