@@ -106,7 +106,7 @@ export default function MiddleScreen() {
     fetchData();
   }, [fetchData]);
 
-  usePolling(fetchData, 10000);
+  usePolling(fetchData, 30000);
 
   return (
     <main
