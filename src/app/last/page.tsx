@@ -128,6 +128,7 @@ export default function LastScreen() {
               >
                 {/* 프레임 이미지 */}
                 <img
+                  key={index}
                   src={gridImages[index]}
                   alt={`Frame ${index}`}
                   className="relative w-full h-full object-contain z-30"

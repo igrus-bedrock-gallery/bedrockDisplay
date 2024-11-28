@@ -140,7 +140,7 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (pendingImages) {
+    if (pendingImages > 0) {
       fetchImages();
     }
   }, [pendingImages]);
