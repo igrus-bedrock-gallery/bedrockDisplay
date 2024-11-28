@@ -22,7 +22,7 @@ export async function GET() {
     const response = await axios.get(lambdaUrl);
     const data: Data = response.data;
 
-    return NextResponse.json({ message: data});
+    return NextResponse.json({data});
   } catch (error) {
     console.error('Error fetching data from Lambda:', error)
     return NextResponse.error();
