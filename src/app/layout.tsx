@@ -1,24 +1,17 @@
-import "@/styles/globals.css";
+import "../styles/globals.css";
+import { ReactNode } from "react";
+import { FrameProvider } from "../contexts/FrameContext";
 
 export const metadata = {
-  title: "Image Gallery",
-  description: "A bedrock gallery",
+  title: "Next.js Example",
+  description: "FrameKey Matching Example",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body
-        className="bg-cover bg-center h-screen w-screen"
-        // style={{
-        // backgroundImage: "url('/images/background.png')", // 배경화면 이미지 설정
-        // }}
-      >
-        {children}
+      <body>
+        <FrameProvider>{children}</FrameProvider>
       </body>
     </html>
   );
