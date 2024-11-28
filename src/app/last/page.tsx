@@ -28,7 +28,7 @@ export default function LastScreen() {
       key: 5,
       Image: "/images/mock1.png",
       Description:
-        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. ",
+        "당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. 당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. 당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다. 당신은 미래 소방관으로 선발되어 화재 현장에서 빛나는 활약을 펼쳤으며, 뛰어난 공로로 세계적인 소방 안전상까지 수상했습니다.",
       timestamp: Date.now() + Math.random(),
     },
     {
@@ -183,8 +183,9 @@ export default function LastScreen() {
                   <p
                     className="w-full break-keep leading-tight"
                     style={{
-                      overflow: "hidden", // 텍스트가 컨테이너를 넘지 않도록 설정
                       textOverflow: "ellipsis", // 넘어가는 텍스트를 ...으로 표시
+                      overflow: "hidden", // 텍스트가 컨테이너를 넘지 않도록 설정
+                      whiteSpace: "normal",
                       display: "-webkit-box", // 줄바꿈을 위한 플렉스박스 설정
                       WebkitBoxOrient: "vertical", // 플렉스박스 축을 수직으로 설정
                       WebkitLineClamp: 5,
