@@ -1,12 +1,41 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { FrameContext } from "../../contexts/FrameContext";
 
 export default function LeftScreen() {
-  const { pendingImages, currentFrameNumber } = useContext(FrameContext)!;
+  // const { pendingImages, lastFrameNumber, activePage, updateServerState } =
+  //   useContext(FrameContext)!;
+  const { pendingImages, lastFrameNumber } = useContext(FrameContext)!;
+  const nextFrameNumber = useRef<number>(0);
+
+  // useEffect(() => {
+  //   // 현재 페이지가 활성화된 경우 작업 수행
+  //   if (activePage === "left") {
+  //     const remainingImages = Math.min(3, pendingImages); // 최대 3개 처리
+  //     const newLastFrameNumber = lastFrameNumber.current + remainingImages;
+  //     const newPendingImages = pendingImages - remainingImages;
+
+  //     // 작업 완료 후 상태 업데이트
+  //     updateServerState({
+  //       lastFrameNumber: newLastFrameNumber,
+  //       pendingImages: newPendingImages,
+  //       activePage: "middle", // 다음 작업으로 middle 설정
+  //     });
+  //   }
+  // }, [activePage, pendingImages, lastFrameNumber.current, updateServerState]);
 
   const explainBox = "/images/textbox2.png";
+
+  const frameStatus = lastFrameNumber.current + pendingImages;
+
+  useEffect(() => {
+    if (frameStatus == 7) {
+      nextFrameNumber.current = 1;
+    } else {
+      nextFrameNumber.current = frameStatus + 1;
+    }
+  }, [pendingImages, lastFrameNumber]);
 
   return (
     <div
@@ -43,7 +72,7 @@ export default function LeftScreen() {
                 fontSize: "clamp(10px, 2vw, 20px)",
               }}
             >
-              <p>{`${currentFrameNumber.current}번 액자로 가주세요`}</p>
+              <p>{`${nextFrameNumber.current}번 액자로 가주세요`}</p>
               <p>{`대기번호 : ${pendingImages}번`}</p>
             </div>
           </div>

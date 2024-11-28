@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useContext, useCallback } from "react";
-import { ImageData, FrameData } from "@/types/frames";
+import { FrameData, Frame } from "@/types/frames";
 import { FrameContext } from "../../contexts/FrameContext";
 
 export default function MiddleScreen() {
@@ -52,6 +52,8 @@ export default function MiddleScreen() {
     },
   ]);
 
+  const [processing, setProcessing] = useState(false);
+
   const updateFramesMiddle = useCallback(
     (frameKey: number, data: FrameData) => {
       console.log("updateFramesMiddle called with:", { frameKey, data });
@@ -72,20 +74,52 @@ export default function MiddleScreen() {
     []
   );
 
+  // const updateFramesMiddle = useCallback(
+  //   (frameKey: number, data: FrameData) => {
+  //     console.log("updateFramesMiddle called with:", { frameKey, data });
+
+  //     setFrames((prev) =>
+  //       prev.map((frame) =>
+  //         frame.key === frameKey
+  //           ? {
+  //               ...frame,
+  //               Image: data.Image,
+  //               Description: data.Description,
+  //               timestamp: Date.now() + Math.random(), // 새 타임스탬프 추가
+  //             }
+  //           : frame
+  //       )
+  //     );
+  //   },
+  //   []
+  // );
   // 프레임 큐에서 데이터 반영
   useEffect(() => {
-    const newFrames = frameQueue.filter(
-      (item) => item.frameKey >= 1 && item.frameKey <= 4
-    );
-    newFrames.forEach((frame) => {
-      updateFramesMiddle(frame.frameKey, {
-        key: frame.frameKey,
-        Image: frame.data.Image,
-        Description: frame.data.Description,
-        timestamp: Date.now() + Math.random(),
+    if (processing || frameQueue.length === 0) return;
+
+    const processFrames = async () => {
+      setProcessing(true); // 작업 중 상태 설정
+
+      // 최대 4개의 데이터를 추출
+      const newFrames = frameQueue.slice(0, 4);
+
+      // 추출한 데이터를 업데이트
+      newFrames.forEach((frame) => {
+        updateFramesMiddle(frame.frameKey, {
+          key: frame.frameKey,
+          Image: frame.data.Image,
+          Description: frame.data.Description,
+          timestamp: Date.now() + Math.random(),
+        });
       });
-    });
-  }, [frameQueue, updateFramesMiddle]);
+
+      // 60초 대기
+      await new Promise((resolve) => setTimeout(resolve, 60000));
+
+      setProcessing(false); // 작업 완료 상태로 설정
+    };
+    processFrames();
+  }, [frameQueue]); //updateFramesMiddle
 
   return (
     <main
