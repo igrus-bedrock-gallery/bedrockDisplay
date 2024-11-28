@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { FrameContext } from "../contexts/FrameContext";
 import MiddleScreen from "./middle/page";
 import LastScreen from "./last/page";
-
+import LeftScreen from "./left/page";
 const Main = () => {
   // const { frameQueue, getNextKey } = useContext(FrameContext)!;
   // const [middleData, setMiddleData] = useState<any[]>([]);
@@ -25,6 +25,7 @@ const Main = () => {
 
   return (
     <div>
+      <LeftScreen />
       <MiddleScreen />
       <LastScreen />
     </div>
