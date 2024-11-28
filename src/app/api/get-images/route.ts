@@ -42,8 +42,8 @@ export async function GET(req: Request) {
           };
         
           try {
-            const lambdaResponse = await axios.post(LAMBDA_FUNCTION_URL, payload);
-            console.log("Lambda response:", lambdaResponse.data);
+            // const lambdaResponse = await axios.post(LAMBDA_FUNCTION_URL, payload);
+            console.log("Lambda response:");
             console.log("Updated data for frame:", frameKey);
           } catch (error) {
             if (axios.isAxiosError(error))
