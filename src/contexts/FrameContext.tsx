@@ -39,14 +39,17 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
   const fetchPendingImages = async () => {
     try {
       const res = await axios.get("/api/pendingImages");
-      setPendingImages(res.data.pendingImages);
+      if (res?.data > 0) {
+        // 받아올 데이터가 존재하는 경우만 pendingImages 업데이트
+        setPendingImages(res.data.pendingImages);
+      }
       console.log("현재 pendingImages 값 : ", res.data.pendingImages);
     } catch (error) {
       console.error("Error fetching pending images:", error);
     }
   };
 
-  // 서버에 pendingImages 값을 업데이트하는 함수
+  // 서버에 pendingImages 값을 줄이는 함수
   const updatePendingImages = async (change: number) => {
     try {
       const res = await axios.post("/api/pendingImages", {
@@ -111,7 +114,6 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
           const updatedData = response.data.map((item: any, index: number) => {
             // map을 돌 때마다, currentFrameNumber를 1 증가시키고 증가된 number를 frameKey에 담아 줌.
             //  1~7 순환
-            // const frameNumberToShow = currentFrameNumber.current;
 
             increaseCurrentFrameNumber();
 
@@ -141,7 +143,7 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (pendingImages > 0) {
+    if (pendingImages > 0 && !isLoading) {
       fetchImages();
     }
   }, [pendingImages]);
