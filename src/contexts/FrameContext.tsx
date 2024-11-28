@@ -20,6 +20,7 @@ interface FrameContextProps {
   isLoading: boolean;
   currentFrameNumber: React.MutableRefObject<number>; // Ref의 타입 정의 수정
   increaseCurrentFrameNumber: () => void;
+  pendingImages: number;
 }
 
 export const FrameContext = createContext<FrameContextProps | undefined>(
@@ -153,6 +154,7 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         currentFrameNumber,
         increaseCurrentFrameNumber,
+        pendingImages,
       }}
     >
       {children}

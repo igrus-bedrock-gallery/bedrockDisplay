@@ -163,18 +163,32 @@ export default function LastScreen() {
                   src={explainBox[index]}
                   alt="Explain Box"
                   className="relative w-full h-full object-contain"
+                  style={{
+                    background:
+                      frame.key === 5 ? "rgba(0, 0, 0, 0.2)" : "transparent",
+                  }}
                 />
 
                 {/* 설명 텍스트 */}
                 <div
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] flex items-center justify-center text-white text-center "
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[85%] h-[88%] flex items-center justify-center text-white text-center"
                   style={{
-                    textOverflow: "ellipsis", // 넘어가는 텍스트를 ...으로 표시
-                    fontWeight: 300,
-                    fontSize: "clamp(10px, 2vw, 20px)", // 반응형 폰트 크기
+                    display: "block",
+                    overflowWrap: "break-word",
                   }}
                 >
-                  <p className="w-full break-keep leading-tight">
+                  <p
+                    className="w-full break-keep leading-tight"
+                    style={{
+                      overflow: "hidden", // 텍스트가 컨테이너를 넘지 않도록 설정
+                      textOverflow: "ellipsis", // 넘어가는 텍스트를 ...으로 표시
+                      display: "-webkit-box", // 줄바꿈을 위한 플렉스박스 설정
+                      WebkitBoxOrient: "vertical", // 플렉스박스 축을 수직으로 설정
+                      WebkitLineClamp: 5,
+                      fontWeight: 300,
+                      fontSize: "clamp(10px, 2vw, 20px)", // 반응형 폰트 크기
+                    }}
+                  >
                     {frame.Description}
                   </p>
                 </div>

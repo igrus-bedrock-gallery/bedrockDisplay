@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { FrameContext } from "../../contexts/FrameContext";
 
 interface WaitingData {
   frameNumber: number;
@@ -8,6 +9,8 @@ interface WaitingData {
 }
 
 export default function LeftScreen() {
+  const { pendingImages } = useContext(FrameContext)!;
+
   const explainBox = "/images/textbox2.png";
   const [waitingList, setWaitingList] = useState<WaitingData[]>([
     { frameNumber: 1, waitingNumber: 2 },
@@ -81,7 +84,7 @@ export default function LeftScreen() {
                 }}
               >
                 <p>{`${item.frameNumber}번 액자로 가주세요`}</p>
-                <p>{`대기번호 : ${item.waitingNumber}번`}</p>
+                <p>{`대기번호 : ${pendingImages}번`}</p>
               </div>
             </div>
           ))}
