@@ -5,7 +5,8 @@ import { FrameData, Frame } from "@/types/frames";
 import { FrameContext } from "../../contexts/FrameContext";
 
 export default function MiddleScreen() {
-  const { frameQueue } = useContext(FrameContext)!;
+  // const { frameQueue } = useContext(FrameContext)!;
+  const { frameQueue, removeFromQueue } = useContext(FrameContext)!;
 
   const [gridImages] = useState<string[]>([
     "/images/frame1.png",
@@ -52,12 +53,8 @@ export default function MiddleScreen() {
     },
   ]);
 
-  const [processing, setProcessing] = useState(false);
-
   const updateFramesMiddle = useCallback(
     (frameKey: number, data: FrameData) => {
-      console.log("updateFramesMiddle called with:", { frameKey, data });
-
       setFrames((prev) =>
         prev.map((frame) =>
           frame.key === frameKey
@@ -65,7 +62,7 @@ export default function MiddleScreen() {
                 ...frame,
                 Image: data.Image,
                 Description: data.Description,
-                timestamp: Date.now() + Math.random(), // 새 타임스탬프 추가
+                timestamp: Date.now(),
               }
             : frame
         )
@@ -74,52 +71,41 @@ export default function MiddleScreen() {
     []
   );
 
-  // const updateFramesMiddle = useCallback(
-  //   (frameKey: number, data: FrameData) => {
-  //     console.log("updateFramesMiddle called with:", { frameKey, data });
-
-  //     setFrames((prev) =>
-  //       prev.map((frame) =>
-  //         frame.key === frameKey
-  //           ? {
-  //               ...frame,
-  //               Image: data.Image,
-  //               Description: data.Description,
-  //               timestamp: Date.now() + Math.random(), // 새 타임스탬프 추가
-  //             }
-  //           : frame
-  //       )
-  //     );
-  //   },
-  //   []
-  // );
-  // 프레임 큐에서 데이터 반영
   useEffect(() => {
-    if (processing || frameQueue.length === 0) return;
+    if (frameQueue.length === 0) return;
 
     const processFrames = async () => {
-      setProcessing(true); // 작업 중 상태 설정
+      const initialKey = frameQueue[0].frameKey; // 첫 번째 처리할 frameKey 기억
 
-      // 최대 4개의 데이터를 추출
-      const newFrames = frameQueue.slice(0, 4);
+      for (let i = 0; i < frameQueue.length; i++) {
+        const frame = frameQueue[i];
 
-      // 추출한 데이터를 업데이트
-      newFrames.forEach((frame) => {
-        updateFramesMiddle(frame.frameKey, {
-          key: frame.frameKey,
-          Image: frame.data.Image,
-          Description: frame.data.Description,
-          timestamp: Date.now() + Math.random(),
-        });
-      });
+        // `initialKey`가 반복될 때만 60초 대기
+        if (frame.frameKey === initialKey && i !== 0) {
+          console.log(`Waiting for 60 seconds at frameKey: ${frame.frameKey}`);
+          await new Promise((resolve) => setTimeout(resolve, 60000));
+        }
 
-      // 60초 대기
-      await new Promise((resolve) => setTimeout(resolve, 60000));
+        // `frameKey`가 1~4번인 경우만 업데이트
+        if (frame.frameKey >= 1 && frame.frameKey <= 4) {
+          updateFramesMiddle(frame.frameKey, {
+            key: frame.frameKey,
+            Image: frame.data.Image,
+            Description: frame.data.Description,
+            timestamp: Date.now(),
+          });
+        }
+      }
 
-      setProcessing(false); // 작업 완료 상태로 설정
+      // 처리된 프레임만 서버에서 제거
+      const relevantFrames = frameQueue.filter(
+        (frame) => frame.frameKey >= 1 && frame.frameKey <= 4
+      );
+      removeFromQueue(relevantFrames.length);
     };
+
     processFrames();
-  }, [frameQueue]); //updateFramesMiddle
+  }, [frameQueue, updateFramesMiddle, removeFromQueue]);
 
   return (
     <main

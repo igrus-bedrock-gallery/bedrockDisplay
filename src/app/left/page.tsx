@@ -27,7 +27,7 @@ export default function LeftScreen() {
 
   const explainBox = "/images/textbox2.png";
 
-  const frameStatus = lastFrameNumber.current + pendingImages;
+  const frameStatus = lastFrameNumber + pendingImages;
 
   useEffect(() => {
     if (frameStatus == 7) {
@@ -72,7 +72,7 @@ export default function LeftScreen() {
                 fontSize: "clamp(10px, 2vw, 20px)",
               }}
             >
-              <p>{`${nextFrameNumber.current}번 액자로 가주세요`}</p>
+              <p>{`${nextFrameNumber}번 액자로 가주세요`}</p>
               <p>{`대기번호 : ${pendingImages}번`}</p>
             </div>
           </div>

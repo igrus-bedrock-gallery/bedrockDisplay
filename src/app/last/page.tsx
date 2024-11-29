@@ -5,7 +5,7 @@ import { FrameData } from "@/types/frames";
 import { FrameContext } from "../../contexts/FrameContext";
 
 export default function LastScreen() {
-  const { frameQueue } = useContext(FrameContext)!;
+  const { frameQueue, removeFromQueue } = useContext(FrameContext)!;
 
   // 고정 frame
   const [gridImages] = useState<string[]>([
@@ -22,7 +22,6 @@ export default function LastScreen() {
     "/images/4th.png",
   ]);
 
-  // 프레임 데이터 상태 관리
   const [frames, setFrames] = useState<FrameData[]>([
     {
       key: 5,
@@ -54,37 +53,99 @@ export default function LastScreen() {
     },
   ]);
 
-  const updateFramesLast = useCallback((frameKey: number, data: FrameData) => {
-    console.log("updateFramesLast called with:", { frameKey, data });
+  // const updateFramesLast = useCallback((frameKey: number, data: FrameData) => {
+  //   setFrames((prev) =>
+  //     prev.map((frame) =>
+  //       frame.key === frameKey
+  //         ? {
+  //             ...frame,
+  //             Image: data.Image,
+  //             Description: data.Description,
+  //             timestamp: Date.now(),
+  //           }
+  //         : frame
+  //     )
+  //   );
+  // }, []);
 
-    setFrames((prev) =>
-      prev.map((frame) =>
-        frame.key === frameKey
-          ? {
-              ...frame,
-              Image: data.Image,
-              Description: data.Description,
-              timestamp: Date.now() + Math.random(), // 새 타임스탬프 추가
-            }
-          : frame
-      )
-    );
-  }, []);
+  // // LastScreen에서 5~7번 프레임만 처리
+  // useEffect(() => {
+  //   if (isLoading || frameQueue.length === 0) return;
 
-  // 프레임 큐에서 데이터 반영
+  //   const processFrames = async () => {
+  //     const relevantFrames = frameQueue.filter(
+  //       (frame) => frame.frameKey >= 5 && frame.frameKey <= 7
+  //     );
+
+  //     relevantFrames.forEach((frame) => {
+  //       updateFramesLast(frame.frameKey, {
+  //         key: frame.frameKey,
+  //         Image: frame.data.Image,
+  //         Description: frame.data.Description,
+  //         timestamp: Date.now(),
+  //       });
+  //     });
+
+  //     // 처리된 프레임 제거
+  //     removeFromQueue(relevantFrames.length);
+  //   };
+
+  //   processFrames();
+  // }, [frameQueue, isLoading, updateFramesLast, removeFromQueue]);
+
+  const updateFramesMiddle = useCallback(
+    (frameKey: number, data: FrameData) => {
+      setFrames((prev) =>
+        prev.map((frame) =>
+          frame.key === frameKey
+            ? {
+                ...frame,
+                Image: data.Image,
+                Description: data.Description,
+                timestamp: Date.now(),
+              }
+            : frame
+        )
+      );
+    },
+    []
+  );
+
   useEffect(() => {
-    const newFrames = frameQueue.filter(
-      (item) => item.frameKey >= 5 && item.frameKey <= 7
-    );
-    newFrames.forEach((frame) => {
-      updateFramesLast(frame.frameKey, {
-        key: frame.frameKey,
-        Image: frame.data.Image,
-        Description: frame.data.Description,
-        timestamp: Date.now() + Math.random(),
-      });
-    });
-  }, [frameQueue, updateFramesLast]);
+    if (frameQueue.length === 0) return;
+
+    const processFrames = async () => {
+      const initialKey = frameQueue[0].frameKey; // 첫 번째 처리할 frameKey 기억
+
+      for (let i = 0; i < frameQueue.length; i++) {
+        const frame = frameQueue[i];
+
+        // `initialKey`가 반복될 때만 60초 대기
+        if (frame.frameKey === initialKey && i !== 0) {
+          console.log(`Waiting for 60 seconds at frameKey: ${frame.frameKey}`);
+          await new Promise((resolve) => setTimeout(resolve, 60000));
+        }
+
+        // `frameKey`가 1~4번인 경우만 업데이트
+        if (frame.frameKey >= 1 && frame.frameKey <= 4) {
+          updateFramesMiddle(frame.frameKey, {
+            key: frame.frameKey,
+            Image: frame.data.Image,
+            Description: frame.data.Description,
+            timestamp: Date.now(),
+          });
+        }
+      }
+
+      // 처리된 프레임만 서버에서 제거
+      const relevantFrames = frameQueue.filter(
+        (frame) => frame.frameKey >= 1 && frame.frameKey <= 4
+      );
+      removeFromQueue(relevantFrames.length);
+    };
+
+    processFrames();
+  }, [frameQueue, updateFramesMiddle, removeFromQueue]);
 
   return (
     <main
