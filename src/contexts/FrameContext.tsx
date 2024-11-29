@@ -40,16 +40,37 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const currentFrameNumber = useRef<number>(0);
 
+  // 초기 상태를 서버로부터 동기화
+  useEffect(() => {
+    const syncState = async () => {
+      try {
+        const state = await fetchServerState(); // 서버 상태 가져오기
+        console.log("초기 서버 상태 동기화 중: ", state);
+        setFrameQueue(state.frameQueue);
+        setPendingImages(state.pendingImages);
+        setLastFrameNumber(state.lastFrameNumber);
+        currentFrameNumber.current = state.lastFrameNumber || 0;
+      } catch (error) {
+        console.error("Error syncing initial server state:", error);
+      }
+    };
+
+    syncState();
+  }, []);
+
   // 주기적으로 pendingImages 상태 가져오기
   useEffect(() => {
     const fetchPendingImages = async () => {
       try {
         const state = await fetchServerState(); ///api/frameQueue에게 get 요청
-        console.log("FrameContent에서의 state : " + state);
+        console.log(
+          "FrameContent에서의 state: ",
+          JSON.stringify(state, null, 2)
+        ); // 객체를 문자열로 변환하여 출력
         if (state.pendingImages > 0 && state.pendingImages !== pendingImages) {
           //달라진 데이터값 데이터 받아오기 전까지 계속 같은 pendingImages값에 의한 state업데이트 방지
           setPendingImages(state.pendingImages); //pending images개수 서버로 부터 받아오기(지역변수 pendingImages 업데이트)
-          console.log("현재의 pendingImages : ", pendingImages);
+          console.log("현재의 pendingImages : ", state.pendingImages);
         }
       } catch (error) {
         console.error("Error fetching pending images:", error);
@@ -59,21 +80,6 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
     const intervalId = setInterval(fetchPendingImages, 30000); // 30초마다 동기화
     return () => clearInterval(intervalId);
   }, []);
-
-  // // 주기적으로 서버로 부터 pendingImages 데이터를 확인
-  // useEffect(() => {
-  //   const syncState = async () => {
-  //     const state = await fetchServerState();
-  //     setFrameQueue(state.frameQueue);
-  //     setPendingImages(state.pendingImages);
-  //     // setLastFrameNumber(state.lastFrameNumber);
-  //     currentFrameNumber.current = state.lastFrameNumber || 0; // 초기값 설정
-  //   };
-
-  //   syncState();
-  //   const interval = setInterval(syncState, 30000); // 30초마다 동기화
-  //   return () => clearInterval(interval);
-  // }, []);
 
   // 서버 값 pendingImages,lastFrame 업데이트
   const updatePendingImages = async (
@@ -150,12 +156,10 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
           // 서버에 데이터 업데이트 & 그에 맞게 지역변수도 같이 업데이트
           await addToQueue(updatedData);
           await updatePendingImages(
-            -response.data.length,
-            currentFrameNumber.current
+            -response.data.length, // pendingImages 업데이트
+            currentFrameNumber.current //마지막 프레임 번호 업데이트
           ); //남아있는 사진 개수
-          // setLastFrameNumber(currentFrameNumber.current); // 마지막 프레임 번호 업데이트
 
-          // lastFrameNumber = currentFrameNumber.current; //현재 마지막 프레임 번호
           // 로컬 변수 업데이트
           localPendingImages -= response.data.length;
           // isDone = true;
