@@ -95,15 +95,6 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // 프레임 번호 증가
-  const increaseCurrentFrameNumber = () => {
-    if (currentFrameNumber.current === 7) {
-      currentFrameNumber.current = 1;
-    } else {
-      currentFrameNumber.current += 1;
-    }
-  };
-
   // frameQueue에 데이터 추가
   const addToQueue = async (frames: Frame[]) => {
     try {
@@ -111,6 +102,15 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
       setFrameQueue(updatedState.frameQueue); //지역변수 frameQueue업데이트
     } catch (error) {
       console.error("Error adding to frame queue:", error);
+    }
+  };
+
+  // 프레임 번호 증가
+  const increaseCurrentFrameNumber = () => {
+    if (currentFrameNumber.current === 7) {
+      currentFrameNumber.current = 1;
+    } else {
+      currentFrameNumber.current += 1;
     }
   };
 

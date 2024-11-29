@@ -53,46 +53,6 @@ export default function LastScreen() {
     },
   ]);
 
-  // const updateFramesLast = useCallback((frameKey: number, data: FrameData) => {
-  //   setFrames((prev) =>
-  //     prev.map((frame) =>
-  //       frame.key === frameKey
-  //         ? {
-  //             ...frame,
-  //             Image: data.Image,
-  //             Description: data.Description,
-  //             timestamp: Date.now(),
-  //           }
-  //         : frame
-  //     )
-  //   );
-  // }, []);
-
-  // // LastScreen에서 5~7번 프레임만 처리
-  // useEffect(() => {
-  //   if (isLoading || frameQueue.length === 0) return;
-
-  //   const processFrames = async () => {
-  //     const relevantFrames = frameQueue.filter(
-  //       (frame) => frame.frameKey >= 5 && frame.frameKey <= 7
-  //     );
-
-  //     relevantFrames.forEach((frame) => {
-  //       updateFramesLast(frame.frameKey, {
-  //         key: frame.frameKey,
-  //         Image: frame.data.Image,
-  //         Description: frame.data.Description,
-  //         timestamp: Date.now(),
-  //       });
-  //     });
-
-  //     // 처리된 프레임 제거
-  //     removeFromQueue(relevantFrames.length);
-  //   };
-
-  //   processFrames();
-  // }, [frameQueue, isLoading, updateFramesLast, removeFromQueue]);
-
   const updateFramesMiddle = useCallback(
     (frameKey: number, data: FrameData) => {
       setFrames((prev) =>
@@ -127,7 +87,7 @@ export default function LastScreen() {
         }
 
         // `frameKey`가 1~4번인 경우만 업데이트
-        if (frame.frameKey >= 1 && frame.frameKey <= 4) {
+        if (frame.frameKey >= 5 && frame.frameKey <= 7) {
           updateFramesMiddle(frame.frameKey, {
             key: frame.frameKey,
             Image: frame.data.Image,
@@ -139,7 +99,7 @@ export default function LastScreen() {
 
       // 처리된 프레임만 서버에서 제거
       const relevantFrames = frameQueue.filter(
-        (frame) => frame.frameKey >= 1 && frame.frameKey <= 4
+        (frame) => frame.frameKey >= 5 && frame.frameKey <= 7
       );
       removeFromQueue(relevantFrames.length);
     };
