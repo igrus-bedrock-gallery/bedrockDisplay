@@ -18,6 +18,7 @@ interface FrameContextProps {
   increaseCurrentFrameNumber: () => void;
   pendingImages: number;
   lastFrameNumber: React.MutableRefObject<number>;
+  removeFromQueue: (count: number) => void; // 수정
 }
 
 export const FrameContext = createContext<FrameContextProps | undefined>(
@@ -30,8 +31,6 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const currentFrameNumber = useRef<number>(0); // Ref로 변경
   const lastFrameNumber = useRef<number>(0);
-  // const [lastFrameNumber, setLastFrameNumber] = useState<number>(0); //서버에서 관리해주기 때문에 useState로 변경
-  // const [activePage, setActivePage] = useState<string>("middle");
 
   // pendingImages 상태를 가져오는 함수
   const fetchPendingImages = async () => {
@@ -70,7 +69,6 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const increaseCurrentFrameNumber = () => {
-    // if (currentFrameNumber.current === 7) {
     if (currentFrameNumber.current === 4) {
       currentFrameNumber.current = 1;
     } else {
@@ -80,6 +78,10 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
 
   const addToQueue = (data: Frame[]) => {
     setFrameQueue((prev) => [...prev, ...data]);
+  };
+
+  const removeFromQueue = (count: number) => {
+    setFrameQueue((prev) => prev.slice(count)); // 앞에서 `count`만큼 제거
   };
 
   const getNextKey = (): Frame | null => {
@@ -171,6 +173,7 @@ export const FrameProvider = ({ children }: { children: ReactNode }) => {
         increaseCurrentFrameNumber,
         pendingImages,
         lastFrameNumber,
+        removeFromQueue,
       }}
     >
       {children}

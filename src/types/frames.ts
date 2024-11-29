@@ -7,7 +7,8 @@ export interface FrameData {
   key: number;
   Image: string;
   Description: string;
-  timestamp: number;
+  timestamp: string;
+  ReportId?: string; // ReportId 속성 추가
 }
 
 export interface Frame {

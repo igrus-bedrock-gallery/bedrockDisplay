@@ -3,7 +3,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FrameContext } from "../contexts/FrameContext";
 import MiddleScreen from "./middle/page";
-import LastScreen from "./last/page";
 import LeftScreen from "./left/page";
 const Main = () => {
   // const { frameQueue, getNextKey } = useContext(FrameContext)!;
@@ -27,7 +26,6 @@ const Main = () => {
     <div>
       <LeftScreen />
       <MiddleScreen />
-      <LastScreen />
     </div>
   );
 };
