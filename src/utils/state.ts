@@ -1,4 +1,6 @@
 //이미지 큐
+import { Mutex } from "async-mutex";
+
 export let imageQueue: { Image: string; Description: string }[] = [];
 
 export function enqueueImage(data: { Image: string; Description: string }) {
@@ -20,21 +22,30 @@ export function clearImageQueue() {
 export let availableKeys: number[] = [];
 
 export let pendingImages = 0;
+const mutex = new Mutex();
 
-export function incrementPendingImages(count: number = 1) {
-  pendingImages += count;
-  console.log(`Pending images incremented by ${count}: ${pendingImages}`);
+export async function incrementPendingImages(count: number = 1) {
+  const release = await mutex.acquire(); // 자원 잠금
+
+  try {
+    pendingImages += count;
+    console.log(`Pending images incremented: ${pendingImages}`);
+  } finally {
+    release(); // 자원 잠금 해제
+  }
 }
 
-export function decrementPendingImages(count: number = 1) {
-  if (pendingImages >= count) {
-    pendingImages -= count;
-    console.log(`Pending images decremented by ${count}: ${pendingImages}`);
-  } else {
-    console.warn(
-      `Cannot decrement by ${count}. Current pendingImages: ${pendingImages}`
-    );
-    pendingImages = 0; // 0보다 작아지지 않도록함
+export async function decrementPendingImages(count: number = 1) {
+  const release = await mutex.acquire();
+  try {
+    if (pendingImages >= count) {
+      pendingImages -= count;
+    } else {
+      pendingImages = 0;
+    }
+    console.log(`Pending images decremented: ${pendingImages}`);
+  } finally {
+    release();
   }
 }
 
