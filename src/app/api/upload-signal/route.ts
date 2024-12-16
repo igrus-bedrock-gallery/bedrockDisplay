@@ -10,6 +10,7 @@ export async function POST(request: Request) {
   console.log("pendingImages : ", pendingImages);
   const body = await request.json();
   console.log("POST request received with body:", body);
+
   return NextResponse.json(
     { message: "Signal received" },
     {

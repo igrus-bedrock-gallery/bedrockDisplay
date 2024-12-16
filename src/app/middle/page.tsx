@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState, useContext, useCallback } from "react";
-import { FrameData, Frame } from "@/types/frames";
+import { FrameData } from "@/types/frames";
 import { FrameContext } from "../../contexts/FrameContext";
 
 export default function MiddleScreen() {
   const { frameQueue, removeFromQueue } = useContext(FrameContext)!;
 
-  const [gridImages] = useState<string[]>([
+  const [frameImages] = useState<string[]>([
     "/images/frame1.png",
     "/images/frame2.png",
     "/images/frame3.png",
@@ -111,6 +111,7 @@ export default function MiddleScreen() {
 
     processFrames();
   }, [frameQueue, updateFramesMiddle, removeFromQueue]);
+
   return (
     <main
       className="relative flex items-center justify-center h-screen bg-contain bg-center"
@@ -147,7 +148,7 @@ export default function MiddleScreen() {
               {/* 프레임 이미지 */}
               <img
                 key={index}
-                src={gridImages[index]}
+                src={frameImages[index]}
                 alt={`Frame ${index}`}
                 className="relative h-full object-contain z-30"
                 style={{ width: "calc(100%*1.03)" }}

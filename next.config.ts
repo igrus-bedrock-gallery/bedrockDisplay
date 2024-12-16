@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
       {
         source: "/",
         destination: "/middle", // 원하는 경로
-        permanent: true, // 영구 리다이렉트 (301 상태)
+        permanent: true, // 영구 리다이렉트 (상태코드 301)
       },
     ];
   },
